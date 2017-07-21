@@ -91,7 +91,6 @@ NS_ASSUME_NONNULL_END
 
 #pragma mark - UISearchBarDelegate
 -(void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-    self.searchController.active = NO;
     [self.tableView reloadData];
 }
 
