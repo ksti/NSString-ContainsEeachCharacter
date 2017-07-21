@@ -43,7 +43,7 @@
     return YES;
 }
 
-- (NSArray *)rangeArrayOfEachCharacter:(NSString *)string options:(NSStringCompareOptions)options {
+- (NSArray<NSValue *> *)rangeArrayOfEachCharacter:(NSString *)string options:(NSStringCompareOptions)options {
     NSMutableArray *mArr = [NSMutableArray array];
     NSRange rangeWholeMatched = [self rangeOfString:string options:options];
     if (rangeWholeMatched.location != NSNotFound) {
@@ -75,7 +75,7 @@
     return [mArr copy];
 }
 
-- (NSArray *)rangeArrayOfEachCharacter:(NSString *)string {
+- (NSArray<NSValue *> *)rangeArrayOfEachCharacter:(NSString *)string {
     return [self rangeArrayOfEachCharacter:string options:NSCaseInsensitiveSearch];
 }
 
