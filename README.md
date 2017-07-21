@@ -1,5 +1,7 @@
 # NSString-ContainsEeachCharacter
 
+![demo](Demo/TestUISearchController/demo.gif)
+
 
 
 ## Install
