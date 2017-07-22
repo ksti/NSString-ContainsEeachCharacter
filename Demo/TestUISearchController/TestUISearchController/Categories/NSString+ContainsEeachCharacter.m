@@ -22,11 +22,16 @@
     BOOL orderSensitive = containsOptions & StringContainsOrderSensitive;
     BOOL literalRepeatSensitive = containsOptions & StringContainsLiteralRepeatSensitive;
     
+    NSRange rangeWholeMatched = [self rangeOfString:string options:options];
+    if (rangeWholeMatched.location != NSNotFound) {
+        return YES;
+    }
+    
+    // order sensitive
     NSInteger startLocation = 0;
-    for (int i = 0; i < [string length]; i++) {
-        NSString *str = [NSString stringWithFormat:@"%C", [string characterAtIndex:i]];
-        // order sensitive
-        if (orderSensitive) {
+    if (orderSensitive) {
+        for (int i = 0; i < [string length]; i++) {
+            NSString *str = [NSString stringWithFormat:@"%C", [string characterAtIndex:i]];
             NSRange range = [[self substringFromIndex:startLocation] rangeOfString:str options:options];
             if (range.location == NSNotFound) {
                 return NO;
