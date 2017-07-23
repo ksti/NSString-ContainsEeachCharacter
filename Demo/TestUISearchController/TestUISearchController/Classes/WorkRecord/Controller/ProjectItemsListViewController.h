@@ -8,6 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
+@class ProjectItemModel;
+
+//block重命名
+typedef void(^SelectedItemHandler)(ProjectItemModel * itemModel, NSIndexPath * indexPath);
+
 @interface ProjectItemsListViewController : UIViewController
+
+@property (nonatomic, copy) SelectedItemHandler selectedItemHandler;
 
 @end

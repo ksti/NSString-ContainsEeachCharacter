@@ -96,6 +96,13 @@
     return _imagePickerColumnNumber;
 }
 
+- (WorkReocrdModel *)workRecordModel {
+    if (!_workRecordModel) {
+        _workRecordModel = [[WorkReocrdModel alloc] init];
+    }
+    return _workRecordModel;
+}
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 - (UIImagePickerController *)imagePickerVc {
@@ -140,7 +147,7 @@
 {
     self.view.backgroundColor = [UIColor whiteColor];
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"返回" style:UIBarButtonItemStyleDone target:self action:@selector(back)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"发送" style:UIBarButtonItemStyleDone target:self action:@selector(send)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"保存" style:UIBarButtonItemStyleDone target:self action:@selector(send)];
     self.title = @"添加工作记录";
     self.navigationController.navigationBarHidden = NO;
     
@@ -235,11 +242,22 @@
         tvWorkDescription.text = strWorkDescription;
         tvWorkDescription.textColor = [UIColor blackColor];
     }
+    //
+    if (self.workRecordModel.workRecordTime.length == 0) {
+        // 日期格式化类
+        NSDateFormatter *format = [[NSDateFormatter alloc] init];
+        // 设置日期格式 为了转换成功
+        format.dateFormat = @"yyyy-MM-dd HH:mm:ss";
+        NSString *dateString = [format stringFromDate:[NSDate date]];
+        self.workRecordModel.workRecordTime = dateString;
+    }
+    lblRecordTime.text = self.workRecordModel.workRecordTime;
+    lblRecordLocation.text = self.workRecordModel.workRecordLocation;
 }
 
 // 同步可选最大张数
 - (void)refreshImagePickerMaxCount {
-    self.imagePickerMaxCount = MAX(0, self.publishPhotosView.imagesMaxCountWhenWillCompose - self.publishPhotosView.images.count);
+    self.imagePickerMaxCount = MAX(0, self.publishPhotosView.imagesMaxCountWhenWillCompose - self.publishPhotosView.images.count) + _selectedAssets.count;
 }
 
 // 点击发送
@@ -278,6 +296,11 @@
     ProjectItemsListViewController *itemsListViewController = [[ProjectItemsListViewController alloc] initWithNibName:@"ProjectItemsListViewController" bundle:nil];
     
     // Pass some object to the new view controller.
+    itemsListViewController.selectedItemHandler = ^(ProjectItemModel *itemModel, NSIndexPath *indexPath) {
+        //
+        self.workRecordModel.selectedItem = itemModel;
+        [btnSelectItem setTitle:itemModel.itemName forState:UIControlStateNormal];
+    };
     
     // Push the view controller.
     [self.navigationController pushViewController:itemsListViewController animated:YES];
@@ -298,7 +321,7 @@
     return YES;
 }
 - (void)textViewDidChangeSelection:(UITextView *)textView {
-    NSLog(@"-------textView.selectedRange.location:%zd", textView.selectedRange.location);
+    //NSLog(@"-------textView.selectedRange.location:%zd", textView.selectedRange.location);
     if (textView.selectedRange.location == 0) {
         return;
     }
@@ -307,7 +330,7 @@
     }
 }
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
-    NSLog(@"-------text:%@", text);
+    //NSLog(@"-------text:%@", text);
     if (strWorkDescription.length <= 0 && text.length > 0) {
         textView.text = @"";
     }
@@ -324,7 +347,7 @@
 }
 -(void)textViewDidChange:(UITextView *)textView {
     strWorkDescription = textView.text;
-    NSLog(@"-------strWorkDescription:%@", strWorkDescription);
+    //NSLog(@"-------strWorkDescription:%@", strWorkDescription);
 }
 
 #pragma mark - PYPhotosViewDelegate
@@ -573,7 +596,7 @@
 /// User click cancel button
 /// 用户点击了取消
 - (void)tz_imagePickerControllerDidCancel:(TZImagePickerController *)picker {
-    // NSLog(@"cancel");
+     NSLog(@"cancel");
 }
 
 // The picker should dismiss itself; when it dismissed these handle will be called.
@@ -706,6 +729,8 @@
     }
     // 同步可选最大张数
     [self refreshImagePickerMaxCount];
+    // 同步更新其下视图的位置
+    [self refreshLayout];
 }
 
 #pragma mark - Private

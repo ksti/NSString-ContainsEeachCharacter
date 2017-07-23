@@ -10,4 +10,24 @@
 
 @implementation ProjectItemModel
 
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        //
+    }
+    return self;
+}
+
+- (instancetype)initWithDict:(NSDictionary *)dict
+{
+    self = [super init];
+    if (self) {
+        //
+        self.itemID = dict[@"itemID"];
+        self.itemName = dict[@"itemName"];
+    }
+    return self;
+}
+
 @end

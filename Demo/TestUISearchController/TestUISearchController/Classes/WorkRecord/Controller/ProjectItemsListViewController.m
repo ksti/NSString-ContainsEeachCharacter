@@ -8,6 +8,7 @@
 
 #import "ProjectItemsListViewController.h"
 #import "NSString+ContainsEeachCharacter.h"
+#import "ProjectItemModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 @interface ProjectItemsListViewController () <UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, UISearchResultsUpdating>
@@ -30,9 +31,12 @@ NS_ASSUME_NONNULL_END
         //初始化数组并赋值
         self.dataList = [NSMutableArray arrayWithCapacity:100];
         for (NSInteger i=0; i<100; i++) {
-            [self.dataList addObject:@{
-                                       @"nick": [NSString stringWithFormat:@"%ld-FlyElephant中文汉字",(long)i],
-                                       }];
+            NSDictionary *dict = @{
+                                   @"nick": [NSString stringWithFormat:@"%ld-FlyElephant中文汉字",(long)i],
+                                   @"itemName": [NSString stringWithFormat:@"%ld-FlyElephant中文汉字",(long)i],
+                            };
+            //[self.dataList addObject:dict];
+            [self.dataList addObject:[[ProjectItemModel alloc] initWithDict:dict]];
         }
     }
     return _dataList;
@@ -69,6 +73,9 @@ NS_ASSUME_NONNULL_END
     self.tableView.tableHeaderView = self.searchController.searchBar;
     
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"reuseIdentifier"];
+    
+    //
+    self.title = @"请选择";
 }
 
 - (void)loadDefaultSetting {
@@ -108,6 +115,9 @@ NS_ASSUME_NONNULL_END
         } else if ([evaluatedObject isKindOfClass:[NSDictionary class]]) {
             //return [evaluatedObject[@"nick"] containsString:searchString];
             return [evaluatedObject[@"nick"] containsEachCharacter:searchString];
+        } else if ([evaluatedObject isKindOfClass:[ProjectItemModel class]]) {
+            //return [evaluatedObject[@"nick"] containsString:searchString];
+            return [((ProjectItemModel*)evaluatedObject).itemName containsEachCharacter:searchString];
         }
         return [evaluatedObject containsObject:searchString];
     }];
@@ -139,15 +149,16 @@ NS_ASSUME_NONNULL_END
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
+    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"reuseIdentifier" forIndexPath:indexPath];
+    UITableViewCell *cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"reuseIdentifier"];
     
     // Configure the cell...
     
     // 显示搜索结果时
     if (self.searchController.active) {
-        NSDictionary *searchResult = self.arrOfSeachResults[indexPath.row];
+        ProjectItemModel *searchResult = self.arrOfSeachResults[indexPath.row];
         // 原始搜索结果字符串.
-        NSString *originResult = searchResult[@"nick"];
+        NSString *originResult = searchResult.itemName;
         
         /*
         // 获取关键字的位置
@@ -178,8 +189,8 @@ NS_ASSUME_NONNULL_END
         [cell.textLabel setAttributedText:attribute];
         cell.textLabel.text = originResult;
     } else {
-        NSDictionary *data = self.dataList[indexPath.row];
-        cell.textLabel.text = data[@"nick"];
+        ProjectItemModel *data = self.dataList[indexPath.row];
+        cell.textLabel.text = data.itemName;
     }
     
     return cell;
@@ -234,15 +245,25 @@ NS_ASSUME_NONNULL_END
      [self.navigationController pushViewController:detailViewController animated:YES];
      */
      
+     [tableView deselectRowAtIndexPath:indexPath animated:YES];
+     ProjectItemModel *model = nil;
      // 显示搜索结果时
      if (self.searchController.active) {
-         NSDictionary *searchResult = self.arrOfSeachResults[indexPath.row];
-         NSLog(@"selected:%@", searchResult[@"nick"]);
+         model = self.arrOfSeachResults[indexPath.row];
+         NSLog(@"selected:%@", model.itemName);
      } else {
-         NSDictionary *data = self.dataList[indexPath.row];
-         NSLog(@"selected:%@", data[@"nick"]);
+         model = self.dataList[indexPath.row];
+         NSLog(@"selected:%@", model.itemName);
      }
- }
+     if (self.selectedItemHandler) {
+         self.selectedItemHandler(model, indexPath);
+     }
+     
+     //
+     [self.searchController.searchBar resignFirstResponder];
+     self.searchController.active = NO;
+     [self.navigationController popViewControllerAnimated:YES];
+}
 
 /*
 #pragma mark - Navigation

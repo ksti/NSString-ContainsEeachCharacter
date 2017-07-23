@@ -13,4 +13,6 @@
 @property (nonatomic, copy) NSString *itemID;
 @property (nonatomic, copy) NSString *itemName;
 
+- (instancetype)initWithDict:(NSDictionary *)dict;
+
 @end
