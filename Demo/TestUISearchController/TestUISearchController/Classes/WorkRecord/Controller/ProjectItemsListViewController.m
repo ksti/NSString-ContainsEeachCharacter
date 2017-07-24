@@ -29,14 +29,14 @@ NS_ASSUME_NONNULL_END
 - (NSMutableArray *)dataList {
     if (!_dataList) {
         //初始化数组并赋值
-        self.dataList = [NSMutableArray arrayWithCapacity:100];
+        _dataList = [NSMutableArray arrayWithCapacity:100];
         for (NSInteger i=0; i<100; i++) {
             NSDictionary *dict = @{
                                    @"nick": [NSString stringWithFormat:@"%ld-FlyElephant中文汉字",(long)i],
                                    @"itemName": [NSString stringWithFormat:@"%ld-FlyElephant中文汉字",(long)i],
                             };
-            //[self.dataList addObject:dict];
-            [self.dataList addObject:[[ProjectItemModel alloc] initWithDict:dict]];
+            //[_dataList addObject:dict];
+            [_dataList addObject:[[ProjectItemModel alloc] initWithDict:dict]];
         }
     }
     return _dataList;
